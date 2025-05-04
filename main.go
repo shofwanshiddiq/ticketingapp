@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"ticketingapp/config"
-	"ticketingapp/entity"
 	"ticketingapp/repositories"
 	"ticketingapp/route"
 	"ticketingapp/services"
@@ -20,14 +18,9 @@ func main() {
 
 	db := config.ConnectDatabase()
 
-	db.AutoMigrate(
-		&entity.User{},
-		&entity.Event{},
-		&entity.Ticket{},
-		&entity.AuditLog{},
-	)
-
 	r := gin.Default()
+
+	config.RegisterRootRoute(r)
 
 	authRepository := repositories.NewAuthRepository(db)
 	eventsReposity := repositories.NewEventsRepository(db)
@@ -38,17 +31,10 @@ func main() {
 	eventsService := services.NewEventsService(*eventsReposity)
 	ticketService := services.NewTicketService(ticketRepository)
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to Shofwan Shiddiq's Ticketing App",
-		})
-	})
-
 	route.SetupRoutes(r, authService, eventsService, userRepository, ticketService)
 
 	// Start server
 	port := ":8080"
 	fmt.Printf("✅ Server is running on http://localhost%s\n", port)
 	r.Run(port)
-
 }

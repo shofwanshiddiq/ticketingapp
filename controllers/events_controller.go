@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"ticketingapp/entity"
 	"ticketingapp/services"
+	"ticketingapp/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,12 +20,43 @@ func NewEventsController(service services.EventsService) *EventsController {
 }
 
 func (ec *EventsController) FindAll(c *gin.Context) {
-	events, err := ec.service.FindAll()
+	// Default values
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
+
+	// Convert to integers
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	// Fetch data with pagination
+	events, totalItems, err := ec.service.FindAll(page, limit)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, events)
+
+	// Format response using response type mapping
+	eventResponses := types.ToEventResponseList(events)
+
+	// Calculate total pages
+	totalPages := int((totalItems + int64(limit) - 1) / int64(limit))
+
+	// Return paginated response
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"data":    eventResponses,
+		"page":    page,
+		"limit":   limit,
+		"total":   totalItems,
+		"pages":   totalPages,
+		"message": "Events fetched successfully",
+	})
 }
 
 func (ec *EventsController) FindByID(c *gin.Context) {

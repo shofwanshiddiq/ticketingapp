@@ -2,8 +2,11 @@ package config
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"ticketingapp/entity"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -23,5 +26,24 @@ func ConnectDatabase() *gorm.DB {
 		panic("Failed to connect to database: " + err.Error())
 	}
 
+	// Auto-migrate models
+	if err := db.AutoMigrate(
+		&entity.User{},
+		&entity.Event{},
+		&entity.Ticket{},
+		&entity.AuditLog{},
+	); err != nil {
+		panic("Failed to migrate database: " + err.Error())
+	}
+
 	return db
+}
+
+// Setup welcome route
+func RegisterRootRoute(r *gin.Engine) {
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Welcome to Shofwan Shiddiq's Ticketing App",
+		})
+	})
 }

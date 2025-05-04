@@ -21,9 +21,11 @@ func NewAuthService(repo repositories.AuthRepository) AuthService {
 
 func (s *authService) Register(user *entity.User) (string, error) {
 	// Hash password
-	if err := user.HashPassword(user.Password); err != nil {
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
 		return "", err
 	}
+	user.Password = hashedPassword
 
 	// Save user to DB
 	if err := s.repo.Create(user); err != nil {
@@ -45,8 +47,8 @@ func (s *authService) Login(email, password string) (string, error) {
 		return "", err
 	}
 
-	// Check password
-	if err := user.CheckPassword(password); err != nil {
+	// Check password using utility
+	if err := utils.CheckPassword(user.Password, password); err != nil {
 		return "", err
 	}
 
