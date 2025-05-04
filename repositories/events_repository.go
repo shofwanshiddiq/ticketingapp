@@ -31,12 +31,10 @@ func (r *EventsRepository) FindAll(offset, limit int) ([]entity.Event, int64, er
 	var events []entity.Event
 	var total int64
 
-	// Count total rows first
 	if err := r.db.Model(&entity.Event{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// Apply offset and limit
 	err := r.db.Offset(offset).Limit(limit).Find(&events).Error
 	if err != nil {
 		return nil, 0, err

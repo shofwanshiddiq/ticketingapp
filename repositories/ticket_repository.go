@@ -54,12 +54,10 @@ func (r *ticketRepository) CreateTicket(ticket *entity.Ticket) error {
 		return errors.New("event capacity is full")
 	}
 
-	// Create ticket
 	if err := r.db.Create(ticket).Error; err != nil {
 		return err
 	}
 
-	// Decrease event capacity
 	event.Capacity -= 1
 	if err := r.db.Save(&event).Error; err != nil {
 		return err

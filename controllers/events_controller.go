@@ -113,14 +113,12 @@ func (ec *EventsController) Delete(c *gin.Context) {
 		return
 	}
 
-	// Validasi: cek apakah event dengan ID tsb ada
 	event, err := ec.service.FindByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
 		return
 	}
 
-	// Lanjut delete
 	if err := ec.service.Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
