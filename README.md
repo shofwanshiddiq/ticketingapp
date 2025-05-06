@@ -63,3 +63,53 @@ Represents an event that users can book tickets for.
 - `Tickets` - List of tickets associated with the event (relation)
 
 ---
+
+# 📡 API Endpoints
+
+This project exposes a RESTful API for a ticketing system. Below are the available endpoints grouped by their functionality.
+
+---
+
+## 🔐 Auth Endpoints
+
+| Method | Endpoint            | Description          |
+|--------|---------------------|----------------------|
+| POST   | `/api/auth/register` | Register a new user  |
+| POST   | `/api/auth/login`    | Authenticate user and receive a JWT token |
+
+> ⚠️ These endpoints are **public** and do not require authentication.
+
+---
+
+## 📅 Event Endpoints
+
+> ✅ **Protected** — Requires JWT token in the `Authorization: Bearer <token>` header
+
+| Method | Endpoint             | Description              |
+|--------|----------------------|--------------------------|
+| GET    | `/api/events/`       | Get all events           |
+| GET    | `/api/events/:id`    | Get event by ID          |
+| POST   | `/api/events/`       | Create a new event       |
+| PUT    | `/api/events/:id`    | Update an existing event |
+| DELETE | `/api/events/:id`    | Delete an event          |
+
+---
+
+## 🎫 Ticket Endpoints
+
+> ✅ **Protected** — Requires JWT token in the `Authorization: Bearer <token>` header
+
+| Method | Endpoint               | Description               |
+|--------|------------------------|---------------------------|
+| GET    | `/api/tickets/`        | Get all tickets (current user or admin) |
+| GET    | `/api/tickets/:id`     | Get ticket details by ID  |
+| POST   | `/api/tickets/`        | Create/purchase a ticket  |
+| PATCH  | `/api/tickets/:id`     | Cancel a ticket (soft delete) |
+
+---
+
+## 🔒 Authentication
+
+All **protected routes** require a valid JWT token in the request headers:
+
+
